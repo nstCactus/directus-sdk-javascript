@@ -33,6 +33,7 @@ import { IUserResponse, IUsersResponse } from "./schemes/response/User";
 // Utilities
 import { getCollectionItemPath } from "./utils/collection";
 import { isString } from "./utils/is";
+import {querify} from "./utils/qs";
 // Manager classes
 import { API, IAPI } from "./API";
 import { Configuration, IConfiguration, IConfigurationOptions } from "./Configuration";
@@ -401,14 +402,15 @@ export class SDK {
    * @see https://docs.directus.io/api/reference.html#assets
    */
   public getAssetUrl(privateHash: string, params?: AssetQueryParamsType): string {
+    const querystring = params ? querify(params) : "";
     const url = [
       this.config.url.replace(/\/$/, ""),
       this.config.project,
       "assets",
       privateHash
     ].join("/");
-    const querystring = Object.entries(params as any[]).map(([prop, val]: [string, any]) => `${prop}=${val}`).join("&");
-    return querystring.length === 0 ? url : url + "?" + querystring;
+
+    return querystring.length > 0 ? url + "?" + querystring : url;
   }
 
   /**
@@ -417,7 +419,7 @@ export class SDK {
   public async getAsset(privateHash: string, params?: AssetQueryParamsType) {
     const previousResponseType = this.api.xhr.defaults.responseType;
 
-    this.api.xhr.defaults.responseType = 'arraybuffer';
+    this.api.xhr.defaults.responseType = "arraybuffer";
     const response = this.api.request(
       "get",
       "/assets/" + privateHash,

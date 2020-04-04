@@ -44,7 +44,7 @@ interface IAssetQueryParameters {
   key: string;
   w: number;
   h: number;
-  f: 'crop'|'contain';
+  f: string;
   q: number;
 }
 
